@@ -59,8 +59,10 @@ public class Parser{
                     String user = ln.substring(ln.indexOf("creator=\"") + 9, ln.indexOf("\"", ln.indexOf("creator=\"") + 9));
                     System.out.println("User:" + user +'\n');
                 }
+                if (ln.contains("</wpt>")){
+                    //waypoints.add(new Waypoint(lat,lon,ele,time,user));
+                }
                 
-                //waypoints.add(new Waypoint(lat,lon,ele,time,user));
                 
             }
             
