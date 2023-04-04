@@ -12,13 +12,12 @@ public class Parser{
     ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();
     //input: a gpx file
     //output: arraylist with waypoint objects
-   
     //Constructor
-    //protected double lat;
-    //protected double lon;
-    //protected double ele;
-    //protected String time;
-    //protected String user;
+    protected double lat;
+    protected double lon;
+    protected double ele;
+    protected String time;
+    protected String user;
     public Parser(){
         
     }
@@ -37,6 +36,7 @@ public class Parser{
                     double lat = Double.parseDouble(ln.substring(ln.indexOf("lat=\"") + 5, ln.indexOf("\"", ln.indexOf("lat=\"") + 5)));
                     double lon = Double.parseDouble(ln.substring(ln.indexOf("lon=\"") + 5, ln.indexOf("\"", ln.indexOf("lon=\"")+5)));
                     System.out.println("Lat: " + lat + ", Lon: " + lon);
+
                     //waypoints.add(new Waypoint(lat));
                 }
                 
