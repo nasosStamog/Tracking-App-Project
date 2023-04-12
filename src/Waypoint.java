@@ -7,14 +7,14 @@ public class Waypoint{
     protected String user;
 
 
-    public Waypoint(double lat,double lon,double ele, String time, String user ){
+    public Waypoint(double lat,double lon,double ele, String time, String user) {
         this.lat = lat;
         this.lon = lon;
         this.ele = ele;
         this.time = time;
         this.user = user;
-
     }
+
     //Dokimastikoi Constructors
     public Waypoint(double lat){
         this.lat = lat;
