@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.io.File;
 
 public class Server {
 
@@ -20,11 +21,15 @@ public class Server {
         DataInputStream dis = new DataInputStream(is);
         int length = dis.readInt();
         byte[] gpxBytes = new byte[length];
+        System.out.println(gpxBytes);
         dis.readFully(gpxBytes);
         dis.close();
         
         
         //Save GPX file on server
+        
+        
+        
         File gpxFile = new File("C:/Users/Martinisk/Desktop/Tracking-App/gpx files in master");
         FileOutputStream fos = new FileOutputStream(gpxFile);
         fos.write(gpxBytes);
