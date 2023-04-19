@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.ArrayList;
 
 public class Master {
     //Workers Initialization
@@ -6,7 +7,13 @@ public class Master {
 
     public static void main(String args[]) throws IOException {
       Server a = new Server();
-      a.openServer();  
+      Parser prs = new Parser();
+      a.openServer();
+      prs.parseGpx("C:/Users/Martinisk/Desktop/Tracking-App/gpx_files_in_master/route1.gpx");
+      System.out.println(prs.getWaypoints());
+      
+
+
 		}
     
 }

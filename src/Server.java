@@ -36,6 +36,16 @@ public class Server {
 
         clientSocket.close();
         serverSocket.close();
+
+        ////////////////////////////////////////////////////////////////
+        //Server Socket for Worker
+        ServerSocket serverSocket2 = new ServerSocket(4320);
+        
+
+        serverSocket2.close(); 
+
+
+        
         
         
         
