@@ -21,7 +21,6 @@ public class Server {
         DataInputStream dis = new DataInputStream(is);
         int length = dis.readInt();
         byte[] gpxBytes = new byte[length];
-        System.out.println(gpxBytes);
         dis.readFully(gpxBytes);
         dis.close();
         
@@ -30,7 +29,7 @@ public class Server {
         
         
         
-        File gpxFile = new File("C:/Users/Martinisk/Desktop/Tracking-App/gpx files in master");
+        File gpxFile = new File("C:/Users/Martinisk/Desktop/Tracking-App/gpx_files_in_master/route1.gpx");
         FileOutputStream fos = new FileOutputStream(gpxFile);
         fos.write(gpxBytes);
         fos.close();
