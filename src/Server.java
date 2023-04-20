@@ -4,71 +4,90 @@ import java.io.File;
 
 public class Server {
 
-    public Server(){};
+    //Socket that receives requests from clients
+    ServerSocket requestClientSocket;
+    
+    //Socket that handles the connection with clients
+    Socket providerClientSocket;
 
-    public void openServer() throws IOException {
+    //Socket that receives requests
+    ServerSocket requestWorkerSocket;
+    
+    //Socket that handles the connection 
+    Socket providerWorkerSocket;
+
+
+    public void openClientServer() throws IOException {
+
+        
+        int counter = 0;
+        String Filename;
+
         try {
 
-        ServerSocket serverSocket = new ServerSocket(4321);
-        System.out.println("Server started. Waiting for client to connect...");
-
-        Socket clientSocket = serverSocket.accept();
-        System.out.println("Client connected.");
-        //Receive Gpx file on server
-        
-        
-        InputStream is = clientSocket.getInputStream();
-        DataInputStream dis = new DataInputStream(is);
-        int length = dis.readInt();
-        byte[] gpxBytes = new byte[length];
-        dis.readFully(gpxBytes);
-        dis.close();
-        
-        
-        //Save GPX file on server
-        
-        
-        
-        File gpxFile = new File("C:/Users/Martinisk/Desktop/Tracking-App/gpx_files_in_master/route1.gpx");
-        FileOutputStream fos = new FileOutputStream(gpxFile);
-        fos.write(gpxBytes);
-        fos.close();
-
-        clientSocket.close();
-        serverSocket.close();
-
-        ////////////////////////////////////////////////////////////////
-        //Server Socket for Worker
-        ServerSocket serverSocket2 = new ServerSocket(4320);
-        
-
-        serverSocket2.close(); 
+            requestClientSocket = new ServerSocket(4321);
+            System.out.println("Server started. Waiting for client to connect...");
 
 
-        
-        
-        
-        
-        
-        /*
-        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            while (true) {
+                providerClientSocket = requestClientSocket.accept();
+                System.out.println("Client connected.");
+                //Actions for kinito
+                InputStream is = providerClientSocket.getInputStream();
+                DataInputStream dis = new DataInputStream(is);
+                int length = dis.readInt();
+                byte[] gpxBytes = new byte[length];
+                dis.readFully(gpxBytes);
+                dis.close();
+                
+                Filename = "route" +Integer.toString(counter) + ".gpx";
 
-        String inputLine;
-
-        while ((inputLine = in.readLine()) != "test") {
-            System.out.println("Received message from client: " + inputLine);
-            out.println("Echo: " + inputLine);
-            System.out.println("test");
-        }
-
-        in.close();
-        out.close();
-
-        clientSocket.close();
-        serverSocket.close();*/
+                File gpxFile = new File("C:/Users/Martinisk/Desktop/Tracking-App/gpx_files_in_master/" + Filename);
+                counter += 1;
+                FileOutputStream fos = new FileOutputStream(gpxFile);
+                fos.write(gpxBytes);
+                fos.close();
+               
+            }
+        
         } catch (IOException e){
             e.printStackTrace();
+        } finally {
+            try {
+                providerClientSocket.close();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+        }
+    } 
+    
+    public void openWorkerServer(int workers) throws IOException {
+
+        try {
+
+            requestWorkerSocket = new ServerSocket(4320);
+            System.out.println("Server started. Waiting for worker to connect...");
+            
+            int connectedWorkers = 0;
+            
+            while (connectedWorkers < workers) {
+                providerWorkerSocket = requestWorkerSocket.accept();
+                System.out.println("Worker connected.");
+                //Actions for workers
+            
+
+                connectedWorkers+=1;
+            }
+            System.out.println("All workers are connected successfully");
+            
+            }catch (IOException e){
+                e.printStackTrace();
+            } finally {
+                try {
+                    providerWorkerSocket.close();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
         }
     }
 }

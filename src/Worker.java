@@ -7,6 +7,12 @@ public class Worker extends Thread {
 
     public Worker(){}
 
+	public static void main(String args[]) {
+		new Worker().start();
+		new Worker().start();
+		new Worker().start();		
+	}
+
     public void run(){
 
         Socket acceptSocket = null;
@@ -15,13 +21,11 @@ public class Worker extends Thread {
 
         try {
 
-            /* Create socket for contacting the server on port 4321*/
+            /* Create socket for contacting the server on port 4320*/
 			acceptSocket = new Socket("127.0.0.1",4320);
             /* Create the streams to send and receive data from server */
 			in = new ObjectInputStream(acceptSocket.getInputStream());
-			out = new ObjectOutputStream(acceptSocket.getOutputStream());
-
-            
+			out = new ObjectOutputStream(acceptSocket.getOutputStream());           
 			
 
 		} catch (UnknownHostException unknownHost) {

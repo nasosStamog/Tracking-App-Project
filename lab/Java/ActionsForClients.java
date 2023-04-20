@@ -17,8 +17,7 @@ ObjectOutputStream out;
 	}
 
 	public void run() {
-		try {
-				
+		try {				
 			int x = in.readInt();
 			int y = in.readInt();
 			int sum = x + y;
