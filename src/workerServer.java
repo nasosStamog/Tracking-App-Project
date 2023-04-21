@@ -5,7 +5,7 @@ import java.net.*;
 public class workerServer extends Thread {
     private waypointsList<Waypoint> wp ;
 
-     //Socket that receives requests
+    //Socket that receives requests
     ServerSocket requestWorkerSocket;
     
     //Socket that handles the connection 
@@ -38,6 +38,8 @@ public class workerServer extends Thread {
                 connectedWorkers+=1;
             }
             System.out.println("All workers are connected successfully");
+
+            
             
             }catch (IOException e){
                 e.printStackTrace();
