@@ -24,8 +24,8 @@ public class Worker extends Thread {
             /* Create socket for contacting the server on port 4320*/
 			acceptSocket = new Socket("127.0.0.1",4320);
             /* Create the streams to send and receive data from server */
-			in = new ObjectInputStream(acceptSocket.getInputStream());
-			out = new ObjectOutputStream(acceptSocket.getOutputStream());           
+			//in = new ObjectInputStream(acceptSocket.getInputStream());
+			//out = new ObjectOutputStream(acceptSocket.getOutputStream());           
 			
 
 		} catch (UnknownHostException unknownHost) {
@@ -34,7 +34,7 @@ public class Worker extends Thread {
 			ioException.printStackTrace();
 		} finally {
 			try {
-				in.close();	out.close();
+				//in.close();	out.close();
 				acceptSocket.close();
 			} catch (IOException ioException) {
 				ioException.printStackTrace();

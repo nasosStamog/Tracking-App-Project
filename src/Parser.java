@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 
 public class Parser{
     //create an ArrayList for waypoints
+    
     ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();
     //input: a gpx file
     //output: arraylist with waypoint objects
