@@ -16,11 +16,6 @@ public class Master {
       //Parser prs = new Parser();
       b.start();
       a.start();
-      
-      
-      //b.openWorkerServer(workers);
-      //prs.parseGpx("C:/Users/Martinisk/Desktop/Tracking-App/gpx_files_in_master/route1.gpx");
-      //System.out.println(prs.getWaypoints());
 		}
     
 }
