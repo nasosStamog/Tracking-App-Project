@@ -1,9 +1,9 @@
 import java.io.*;
 
-
 public class Master {
     //Workers Initialization
     static int workers = 3;
+    
    
 
     public static void main(String args[]) throws IOException {

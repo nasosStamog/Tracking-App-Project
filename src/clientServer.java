@@ -62,8 +62,7 @@ public class clientServer extends Thread {
                 }
                 temp.clear();
 
-                System.out.println("Size of wp : " + wp.size());
-                
+                System.out.println("Size of wp : " + wp.size());            
                
             }
         
