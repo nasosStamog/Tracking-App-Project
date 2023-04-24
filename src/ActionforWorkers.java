@@ -24,7 +24,12 @@ public class ActionforWorkers extends Thread {
     }
 
     public void run(){ 
-       //out.writeObject(wp); 
+       try {
+        out.writeObject(wp);
+    } catch (IOException e) {
+        
+        e.printStackTrace();
+    } 
        //in.readObject();
 
        //Reduce
