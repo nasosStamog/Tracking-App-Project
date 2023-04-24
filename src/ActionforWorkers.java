@@ -2,33 +2,35 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 
-
-
-public class ActionforWorkers extends Thread{
-
+public class ActionforWorkers extends Thread {
     ObjectInputStream in;
     ObjectOutputStream out;
-    waypointsList wp;
+    waypointsList<Waypoint> wp;
 
 
     public ActionforWorkers(Socket connection){
-
-        try {
-				
+        try {				
 			in = new ObjectInputStream(connection.getInputStream());
 			out = new ObjectOutputStream(connection.getOutputStream());
 
-            wp = (waypointsList) in.readObject();
-
-			System.out.println("One of workers has " + temp.size() + " waypoints inside");	
-
 		} catch (IOException e) {
 			e.printStackTrace();
-		}         
+		}       
        
     }
 
-    public void run(ArrayList<Waypoint> chunk){   
+    public void set(waypointsList<Waypoint> wp){
+        this.wp = wp;
+    }
+
+    public void run(){ 
+       //out.writeObject(wp); 
+       //in.readObject();
+
+       //Reduce
+
+       //Fill an arraylist with reduced results and the client server will take it to clients
+
              
     }
 }
