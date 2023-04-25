@@ -52,7 +52,7 @@ public class workerServer extends Thread { //Our server must be thread to run
             int order = 0;
 
             while (true){
-                //wl.get(order).set(wp.returnNWaypoints);
+                //wl.get(order).set(wp.returnNWaypoints); chunk
                 //wl.get(order).start();
                 order+=1;
                 if(order > wl.size()){order = 0;}
