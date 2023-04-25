@@ -52,8 +52,13 @@ public class workerServer extends Thread { //Our server must be thread to run
             int order = 0;
 
             while (true){
+<<<<<<< HEAD
                 //wl.get(order).set(wp.returnNWaypoints); chunk
                 //wl.get(order).start();
+=======
+                wl.get(order).set(wp.getNWaypoints(10));//chunk me 10 waypoints
+                wl.get(order).start();
+>>>>>>> ea37b21e71e26ed02c5d687c769fc28ab069e4d2
                 order+=1;
                 if(order > wl.size()){order = 0;}
             }

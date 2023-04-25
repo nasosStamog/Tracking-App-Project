@@ -36,6 +36,8 @@ public class Worker extends Thread {
 			System.err.println("You are trying to connect to an unknown host!");
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}finally {
 			try {
 				in.close();	
