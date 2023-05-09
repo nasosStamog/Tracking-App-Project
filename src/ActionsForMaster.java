@@ -52,7 +52,7 @@ public ActionsForMaster(Socket clientSocket, ArrayList<Object> configList) {
 }
 
 public void run() {
-
+//Run
     try {
         //Reads the file from client and stores it temporary in masters memory.
         InputStream is = clientSocket.getInputStream();
