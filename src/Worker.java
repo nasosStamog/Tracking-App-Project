@@ -1,54 +1,50 @@
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
 
-public class Worker extends Thread {
-	
-	public static void main(String args[]) {
-		new Worker().start();		
-	}
+public class Worker {
+    //Class Worker: This is the class that runs on the worker machine. Receives request from master and starts threads that proccess the data. 
+    //Sends back the results of computation.
+    int port;
 
-    public void run(){
+    public static void main(String args[]) {
+        new Worker(4320).openServer();
 
-        Socket acceptSocket = null;
-        ObjectInputStream in = null;
-		ObjectOutputStream out = null;
+    }
 
-		waypointsList<Waypoint> wp;
+    /* Define the socket that receives requests */
+    ServerSocket s;
+    /* Define the socket that is used to handle the connection */
+    Socket providerSocket;
 
+    public Worker(int port){
+        this.port = port;
+    }
+
+
+    void openServer() {
         try {
 
-            /* Create socket for contacting the server on port 4320*/
-			acceptSocket = new Socket("127.0.0.1",4320);
+            /* Create Server Socket */
+            s = new ServerSocket(port);
 
-            /* Create the streams to send and receive data from server with help of actionForWorkers */
-			in = new ObjectInputStream(acceptSocket.getInputStream());
-			out = new ObjectOutputStream(acceptSocket.getOutputStream());
+            while (true) {
+                /* Accept the connection */
+                providerSocket = s.accept();
+                System.out.println("Master sent new request");     
 
-			wp = (waypointsList<Waypoint>) in.readObject();
+                /* Handle the request */
+                Thread d = new ActionsForWorkers(providerSocket);
+                d.start();
+            }
 
-			//map waypoints, return array with keys 
-
-
-			
-
-		} catch (UnknownHostException unknownHost) {
-			System.err.println("You are trying to connect to an unknown host!");
-		} catch (IOException ioException) {
-			ioException.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}finally {
-			try {
-				in.close();	
-				out.close();
-				acceptSocket.close();
-			} catch (IOException ioException) {
-				ioException.printStackTrace();
-			}
-		}
-	}       
-
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        } finally {
+            try {
+                providerSocket.close();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+        }
+    }
 }
-    
-

@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -6,11 +5,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Parser{
-    //create an ArrayList for waypoints
-    
-    ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();
+    //Parser Class helps us to parse the gpx file, and make its content managable.
     //input: a gpx file
     //output: arraylist with waypoint objects
+    
+    waypointsList<Waypoint> waypoints = new waypointsList<>();
+    
     //Constructor
     protected double lat;
     protected double lon;
@@ -18,12 +18,7 @@ public class Parser{
     protected String time;
     protected String user;
 
-    public Parser(){
-        
-    }
-
     //gpx input
-
     public void parseGpx(String path){
 
         try(BufferedReader br = new BufferedReader( new FileReader(path)) ) {
@@ -71,7 +66,7 @@ public class Parser{
         return user;
     }
 
-    public ArrayList<Waypoint> getWaypoints(){
+    public waypointsList<Waypoint> getWaypoints(){
         return waypoints ;
     }
 }
