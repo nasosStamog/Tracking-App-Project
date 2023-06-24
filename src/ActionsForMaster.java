@@ -7,7 +7,7 @@ public class ActionsForMaster extends Thread{
     //Action for Master Class: This class extends thread and allows master to handle a lot of requests at the same time.
     //Action for Master Method separates the waypoint list from a client into n chunks, send them to workers, receive the intermediate results, 
     //perform the reduce method, and finally send the results back to clients.
-
+    int requestcode;
     //Streams for communication with Clients
     ObjectInputStream cin;
     ObjectOutputStream cout;
@@ -33,10 +33,11 @@ public class ActionsForMaster extends Thread{
     static HashMap<String, Double> avgUsersDist = new HashMap<>();
     static HashMap<String, Double> avgUsersElev = new HashMap<>();
     static HashMap<String, Double> avgUsersTime = new HashMap<>();
+    static ArrayList<String> differentUsers = new ArrayList<String>();
     //for all users
     static double allUserDist = 0;
     static double allUserElev = 0;
-    static double allUserTime= 0;
+    static double allUserTime = 0;
 
 //Constructor of the class
 public ActionsForMaster(Socket clientSocket, ArrayList<Object> configList) {
@@ -53,106 +54,171 @@ public ActionsForMaster(Socket clientSocket, ArrayList<Object> configList) {
 
 public void run() {
     try {
-        //Reads the file from client and stores it temporary in masters memory.
-        InputStream is = clientSocket.getInputStream();
-        DataInputStream dis = new DataInputStream(is);
-        int length = dis.readInt();
-        byte[] gpxBytes = new byte[length];
-        dis.readFully(gpxBytes);
+        String user = (String) cin.readObject();
+        if(!differentUsers.contains(user)){differentUsers.add(user);}
+        requestcode =(int) cin.readObject();
 
-        String Filename = "route" +Integer.toString((int)this.getId()) + ".gpx";
-        Filename = "gpxs_in_master/" + Filename;
+        if (requestcode==0){
+            //Reads the file from client and stores it temporary in masters memory.
+            InputStream is = clientSocket.getInputStream();
+            DataInputStream dis = new DataInputStream(is);
+            int length = dis.readInt();
+            byte[] gpxBytes = new byte[length];
+            dis.readFully(gpxBytes);
 
-        File gpxFile = new File(Filename);
-        try (FileOutputStream fos = new FileOutputStream(gpxFile)) {
-            fos.write(gpxBytes);
-        } 
+            String Filename = "route" +Integer.toString((int)this.getId()) + ".gpx";
+            Filename = "gpxs_in_master/" + Filename;
 
-        //Parse the file to get information
-        Parser prs = new Parser();
-        prs.parseGpx(Filename);
+            File gpxFile = new File(Filename);
+            try (FileOutputStream fos = new FileOutputStream(gpxFile)) {
+                fos.write(gpxBytes);
+            } 
 
-        //Deletes file
-        gpxFile.delete();
+            //Parse the file to get information
+            Parser prs = new Parser();
+            prs.parseGpx(Filename);
 
-        String user = prs.getUser();
-        waypointsList<Waypoint> temp = prs.getWaypoints();
+            //Deletes file
+            gpxFile.delete();
 
-        // chunk  creation
-        int n = temp.size();
+            //String user = prs.getUser();
+            waypointsList<Waypoint> temp = prs.getWaypoints();
+            waypointsList<Waypoint> temp2 = prs.getWaypoints();  
+            // chunk  creationv
+            int n = temp.size();
+            
+            //Size of chunk is determind by the number of workers. Every worker gets the same number of waypoints except the last one in the configList
+            //The last one take all the waypoints that are in the list.
 
-        //Size of chunk is determind by the number of workers. Every worker gets the same number of waypoints except the last one in the configList
-        //The last one take all the waypoints that are in the list.
+            int chunkSize = n /(configList.size()/2) ; 
 
-        int chunkSize = n /(configList.size()/2) ; 
+            ArrayList<HashMap<String, Double>> unreducedResults = new ArrayList<HashMap<String, Double>>();        
+            waypointsList<Waypoint> chunk;
+            ArrayList<waypointsList<Waypoint>> chunks = new ArrayList<waypointsList<Waypoint>>();
 
-        ArrayList<HashMap<String, Double>> unreducedResults = new ArrayList<HashMap<String, Double>>();        
-        waypointsList<Waypoint> chunk;
 
-        for(int i = 0; i < configList.size()/2; i++){
-            requestSocket = new Socket((String)configList.get(i+configList.size()/2), Integer.parseInt((String) configList.get(i)));
+            for(int i = 0; i < configList.size()/2; i++){
+                chunks.add(new waypointsList<>());
 
-            /* Create the streams to send and receive data from worker*/
-            wout = new ObjectOutputStream(requestSocket.getOutputStream());
-            win = new ObjectInputStream(requestSocket.getInputStream());
-
-            if(i == configList.size()/2){
-                chunk = temp.getAll();
-                
-            }else{
-                chunk = temp.getNWaypoints(chunkSize);
             }
+            
+            
+            int counter = 1;
+            while(temp2.size()>0){
 
-            wout.writeObject(chunk);
-            wout.flush();
-            @SuppressWarnings("unchecked")
-            HashMap<String, Double> w12 = (HashMap<String, Double>) win.readObject();
-            unreducedResults.add(w12);
-            wout.close();
-            win.close();
-        }
+                chunks.get((counter-1)).add(temp2.get(0));
+                temp2.remove(0);
+                
+                if (counter==configList.size()/2){
+                    counter=1;
+                }
+                else{
+                    counter+=1;
+                }
+                
+
+            }
+            
+           
+            
+            for(int i = 0; i < configList.size()/2; i++){
+                requestSocket = new Socket((String)configList.get(i+configList.size()/2), Integer.parseInt((String) configList.get(i)));
+
+                /* Create the streams to send and receive data from worker*/
+                wout = new ObjectOutputStream(requestSocket.getOutputStream());
+                win = new ObjectInputStream(requestSocket.getInputStream());
+                
+                
+
+                wout.writeObject(chunks.get(i));
+                wout.flush();
+                @SuppressWarnings("unchecked")
+                HashMap<String, Double> w12 = (HashMap<String, Double>) win.readObject();
+                unreducedResults.add(w12);
+                wout.close();
+                win.close();
+            }
+            
+            Double totalDistance = reduce("Total Distance", unreducedResults);
+
+            //Calculates Average Distance for each user
+            userDistance.put(user, totalDistance);
+            userDistance1.add(userDistance);
+            avgUsersDist = userCalc(userDistance1);
+            
+            ArrayList<Double> valuesdistance = new ArrayList<>();
+            //Calculates Average Distance for all users
+            for (HashMap<String, Double> hashMap : userDistance1) {
+                valuesdistance.addAll(hashMap.values());
+                
+            }
+           
+            allUserDist = 0;
+            for (double value : valuesdistance) {
+               
+                allUserDist += value;
+            }
+            
+            allUserDist = allUserDist/differentUsers.size();
+            
         
-        Double totalDistance = reduce("Total Distance", unreducedResults);
+            Double averageSpeed = reduce("Average Speed", unreducedResults);
+            
+            Double elevation = reduce("Total Elevation", unreducedResults);
 
-        //Calculates Average Distance for each user
-        userDistance.put(user, totalDistance);
-        userDistance1.add(userDistance);
-        avgUsersDist = userCalc(userDistance1);
-
-        //Calculates Average Distance for all users
-        for (double value : avgUsersDist.values()) {
-            allUserDist += value;
-        }
-
-        Double averageSpeed = reduce("Average Speed", unreducedResults);
+            //Calculates Average Elevation for each user
+            userEle.put(user, elevation);
+            userEle1.add(userEle);
+            avgUsersElev = userCalc(userEle1);
+            ArrayList<Double> valueselev = new ArrayList<>();
+            //Calculates Average Elevation for all users
+            for (HashMap<String, Double> hashMap : userEle1) {
+                valueselev.addAll(hashMap.values());
+            }
+            allUserElev = 0;
+            for (double value : valueselev) {
+                
+                allUserElev += value;
+            }
+            
+            allUserElev = allUserElev/differentUsers.size();
+            
+            Double totalTime = reduce("Total Time", unreducedResults);
+            //Calculates Average Time for each user
+            userTime.put(user, totalTime);
+            userTime1.add(userTime);
+            avgUsersTime = userCalc(userTime1);
+            ArrayList<Double> valuestime = new ArrayList<>();
+            //Calculates Average Time for all users
+            for (HashMap<String, Double> hashMap : userTime1) {
+                valuestime.addAll(hashMap.values());
+                
+            }
+            allUserTime = 0;
+            for (double value : valuestime) {
+                allUserTime += value;
+            }
+            allUserTime = allUserTime/differentUsers.size();
+            //Send results back to client
+            
+            cout.writeInt(1);
+            cout.writeObject(totalDistance);
+            cout.writeObject(averageSpeed);
+            cout.writeObject(elevation);
+            cout.writeObject(totalTime);
+            cout.writeObject(user);
         
-        Double elevation = reduce("Total Elevation", unreducedResults);
-
-        //Calculates Average Elevation for each user
-        userEle.put(user, elevation);
-        userEle1.add(userEle);
-        avgUsersElev = userCalc(userEle1);
-        //Calculates Average Elevation for all users
-        for (double value : avgUsersElev.values()) {
-            allUserElev += value;
-        }
         
-        Double totalTime = reduce("Total Time", unreducedResults);
-        //Calculates Average Time for each user
-        userTime.put(user, totalTime);
-        userTime1.add(userTime);
-        avgUsersTime = userCalc(userTime1);
-        //Calculates Average Time for all users
-        for (double value : avgUsersTime.values()) {
-            allUserTime += value;
+            cout.writeObject(avgUsersDist);
+            cout.writeObject(avgUsersElev);
+            cout.writeObject(avgUsersTime);
         }
-
-        //Send results back to client
-        cout.writeObject(totalDistance);
-        cout.writeObject(averageSpeed);
-        cout.writeObject(elevation);
-        cout.writeObject(totalTime);
-        cout.writeObject(user);
+            //Returns Average Users Data in double
+            if (requestcode==1){
+            cout.writeObject(allUserDist);
+            cout.writeObject(allUserElev);
+            cout.writeObject(allUserTime);
+        }
         cout.flush();
     } catch (IOException e) {
         e.printStackTrace();
@@ -160,10 +226,14 @@ public void run() {
         throw new RuntimeException(e);
     } finally {
         try {
+            if (requestcode==0){
             win.close();
-            wout.close();
+            wout.close();}
+        
+            if(requestcode==1){
             cin.close();
             cout.close();
+        }
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
