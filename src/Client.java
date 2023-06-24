@@ -2,6 +2,7 @@ import java.io.*;
 import java.net.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -65,7 +66,7 @@ public class Client {
             Double elevation = (Double) in.readObject();
             Double totalTime = (Double) in.readObject();
             String user = (String) in.readObject();
-
+            
             DecimalFormat df = new DecimalFormat("#.##");
             System.out.println(user +": ");
             System.out.println("    Total Distance " + df.format(totalDistance) + " kilometers.");

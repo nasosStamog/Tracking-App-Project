@@ -20,7 +20,6 @@ public class Master {
     Socket requestSocket;
     Socket requestSocket1;
     Socket requestSocket2;
-
     ObjectInputStream in;
     ObjectOutputStream out;
     ObjectInputStream win;
