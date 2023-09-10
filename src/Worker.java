@@ -7,8 +7,8 @@ public class Worker {
     int port;
 
     public static void main(String args[]) {
-        new Worker(4320).openServer();
-
+        new Worker(4322).openServer();
+        
     }
 
     /* Define the socket that receives requests */
